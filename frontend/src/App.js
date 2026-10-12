@@ -4,13 +4,19 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { BrowserRouter as Router,Routes,Route } from "react-router-dom";
 import ProductDetail from "./pages/ProductDetail";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import{ToastContainer}from'react-toastify';
 import Cart from'./pages/Cart';
 import 'react-toastify/dist/ReactToastify.css';
 function App() {
 
-  const[cartItems,setCartItems]=useState([]);
+  const [cartItems, setCartItems] = useState(() =>
+    JSON.parse(localStorage.getItem("cartItems") || "[]"),
+  );
+
+  useEffect(() => {
+    localStorage.setItem("cartItems", JSON.stringify(cartItems));
+  }, [cartItems]);
   return (
     <div className="App">
          
