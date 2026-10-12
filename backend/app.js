@@ -14,8 +14,19 @@ app.use(express.json());
 app.use(cors())
 app.use("/api/v1", products);
 app.use("/api/v1/", orders);
-app.listen(process.env.PORT, () => {
-  console.log(
-    `server listening to port ${process.env.PORT} in ${process.env.NODE_ENV}`,
-  );
-});
+if (require.main === module) {
+  const connectDatabase = require("./config/connectDatabase");
+
+  connectDatabase()
+    .then(() => {
+      app.listen(process.env.PORT || 8000, () => {
+        console.log("Server started");
+      });
+    })
+    .catch((error) => {
+      console.error("Database connection failed:", error.message);
+      process.exit(1);
+    });
+}
+
+module.exports = app;
