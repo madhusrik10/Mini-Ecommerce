@@ -9,32 +9,37 @@ dotenv.config({
 });
 
 const app = express();
+const connectDatabase = require("./config/connectDatabase");
 
 const products = require("./routes/product");
 const orders = require("./routes/order");
-const connectDatabase = require("./config/connectDatabase");
 
 app.use(express.json());
 app.use(cors());
 
+// Connect before handling database-backed routes.
+app.use(async (req, res, next) => {
+  try {
+    await connectDatabase();
+    next();
+  } catch (error) {
+    console.error("MongoDB connection failed:", error.message);
+    res.status(503).json({
+      message: "Database connection failed",
+    });
+  }
+});
+
 app.use("/api/v1", products);
 app.use("/api/v1/", orders);
 
-// Vercel handles incoming requests when the app is exported.
 module.exports = app;
 
-// Start a local server only when running directly.
+// Local development only.
 if (require.main === module) {
-  connectDatabase()
-    .then(() => {
-      const PORT = process.env.PORT || 8000;
+  const PORT = process.env.PORT || 8000;
 
-      app.listen(PORT, () => {
-        console.log(`Server started on port ${PORT}`);
-      });
-    })
-    .catch((error) => {
-      console.error("Database connection failed:", error.message);
-      process.exit(1);
-    });
+  app.listen(PORT, () => {
+    console.log(`Server started on port ${PORT}`);
+  });
 }
