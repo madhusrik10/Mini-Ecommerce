@@ -8,7 +8,6 @@ dotenv.config({ path: path.join(__dirname, "config", "config.env") });
 const products = require("./routes/product");
 const orders = require("./routes/order");
 const connectDatabase = require("./config/connectDatabase");
-console.log(process.env.DB_URL);
 connectDatabase();
 
 app.use(express.json());
